@@ -2,7 +2,7 @@
 
 {% from 'host/common.html' import edit_field %}
 
-{% block extra_head %}
+{% block head %}
 <script>
     $(function() {
         var current_form = null;
@@ -76,7 +76,7 @@
 
     });
 </script>
-{% endblock extra_head %}
+{% endblock head %}
 
 {% block main %}
 <div id="csm-message-dialog" class="modal" role="dialog">

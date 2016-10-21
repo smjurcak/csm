@@ -3,7 +3,7 @@
 {% from 'host/common.html' import edit_field %}
 {% from 'share/select_server.html' import select_server %}
 
-{% block extra_head %}
+{% block head %}
 
 <script src="/static/jquery/js/select_files.js"></script>
 <script src="/static/jquery/js/select_server.js"></script>
@@ -211,7 +211,7 @@ $(function() {
     }
 </style>
 
-{% endblock extra_head %}
+{% endblock head %}
 
 {% block main %}
 <form id="form" class="form-horizontal">

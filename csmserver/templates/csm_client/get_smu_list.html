@@ -2,7 +2,7 @@
 {% from 'host/common.html' import edit_field %}
 {% from 'host/common.html' import alert_cco_lookup_disabled %}
 
-{% block extra_head %}
+{% block head %}
 <script src="/static/jquery/js/smu_info_dialog.js"></script>
 <script src="/static/jquery/js/browse_server_dialog.js"></script>
 <script>
@@ -520,7 +520,7 @@
         white-space: normal;
     }
 </style>
-{% endblock extra_head %}
+{% endblock head %}
 
 {% block main %}
 <div id="export-software-information-dialog" class="modal" role="dialog">
