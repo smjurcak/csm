@@ -19,7 +19,11 @@ $('#form').submit(function() {
 $('.UTCDate').val(function(index, currentValue) {
     // Invalid date would be less than 15 characters
     if ($(this).text().length > 15) {
-        $(this).text(convertToLocaleString($(this).text()));
+        if (use_utc_timezone) {
+            $(this).text($(this).text() + ' UTC');
+        } else {
+            $(this).text(convertToLocaleString($(this).text()));
+        }
     }
 });
 
@@ -68,7 +72,7 @@ $('#browse-cisco-button').on('click', function(e) {
     on_display_cisco_software_dialog(region_id, ["{{ host.hostname }}"]);
 });
 
-{% endblock head_schedule_install %}
+{% endblock %}
 
 {% block main_schedule_install %}
 
@@ -122,4 +126,4 @@ $('#browse-cisco-button').on('click', function(e) {
     </div>
 </div>
 
-{% endblock main_schedule_install %}
+{% endblock %}

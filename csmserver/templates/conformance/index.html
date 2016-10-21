@@ -4,7 +4,7 @@
 {% from 'conformance/conformance_report_dialog.html' import conformance_report_dialog %}
 {% from 'conformance/make_conform_dialog.html' import make_conform_dialog %}
 
-{% block extra_head %}
+{% block head %}
 
 <script src="/static/jquery/js/conformance_report_dialog.js"></script>
 <script src="/static/jquery/js/select_server.js"></script>
@@ -13,7 +13,23 @@
   
 <script charset="utf-8">
 
+    var use_utc_timezone = "{{ system_option.use_utc_timezone }}" == 'True';
     $(function() {
+        if (use_utc_timezone) {
+            $('#label_scheduled_time').text('Scheduled Time (UTC)');
+        } else {
+            $('#label_scheduled_time').text('Scheduled Time');
+        }
+
+        // server_time is always in UTC format.
+        var current_time = "{{ server_time | datetime_string }}";
+        if (!use_utc_timezone) {
+            current_time = convertToLocaleString(current_time);
+        }
+
+        $('#scheduled-time-UTC').val(function(index, value) {
+            $('#scheduled-time').val(current_time);
+        });
 
         $('#imp-exp-btn-gr').hide();
 
@@ -83,7 +99,7 @@
                 success: function(response) {
                     $.each(response, function(index, element) {
                         window.location.href = '/conformance/api/export_conformance_report/report/' + id + '?locale_datetime=' +
-                            convertToLocaleString(element[0].conformance_report_datetime) +
+                            getDateStringfromUTCString(element[0].conformance_report_datetime, use_utc_timezone) +
                             '&include_host_packages=' + include_host_packages;
                     });
                 }
@@ -248,7 +264,7 @@
                     $.each(response, function(index, element) {
                         for (i = 0; i < element.length; i++) {
                              $('#conformance_reports').append('<option value="' + element[i].id + '">' + 
-                                 convertToLocaleString(element[i].created_time) + ' - ' + element[i].software_profile + '</option>');
+                                 getDateStringfromUTCString(element[i].created_time, use_utc_timezone) + ' - ' + element[i].software_profile + '</option>');
                         }
                     });
                     
@@ -516,7 +532,7 @@
     }
 </style>
 
-{% endblock extra_head %}  
+{% endblock head %}
   
 {% block main %}
 
@@ -709,4 +725,4 @@
         </div>
     </div>
 </div>
-{% endblock main %}
+{% endblock %}

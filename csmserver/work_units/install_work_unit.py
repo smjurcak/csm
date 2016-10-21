@@ -22,15 +22,12 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 # THE POSSIBILITY OF SUCH DAMAGE.
 # =============================================================================
-from sqlalchemy import and_
-
 from handlers.loader import get_inventory_handler_class
 from handlers.loader import get_install_handler_class
 from context import InstallContext
 
 from utils import create_log_directory
 from utils import is_empty
-from utils import datetime_from_utc_to_local
 from utils import get_log_directory
 from utils import get_file_list
 
@@ -66,13 +63,13 @@ class InstallWorkUnit(WorkUnit):
     def get_unique_key(self):
         return self.host_id
 
-    def get_software(self, ctx, logger):
+    def get_inventory(self, ctx, logger):
         handler_class = get_inventory_handler_class(ctx)
         if handler_class is None:
             logger.error('SoftwareManager: Unable to get handler for %s', ctx.host.software_platform)
 
         handler = handler_class()
-        if handler.get_software(ctx):
+        if handler.get_inventory(ctx):
             # Update the time stamp
             ctx.host.inventory_job[0].set_status(JobStatus.COMPLETED)
 
@@ -113,8 +110,11 @@ class InstallWorkUnit(WorkUnit):
             handler.execute(ctx)
 
             if ctx.success:
-                # Update the software
-                self.get_software(ctx, logger)
+                try:
+                    # Update the software
+                    self.get_inventory(ctx, logger)
+                except Exception:
+                    pass
                 self.archive_install_job(db_session, logger, ctx, host, install_job, JobStatus.COMPLETED, process_name)
             else:
                 self.archive_install_job(db_session, logger, ctx, host, install_job, JobStatus.FAILED, process_name)
@@ -196,11 +196,11 @@ class InstallWorkUnit(WorkUnit):
                 message += 'The scheduled installation for host "' + host.hostname + '" has FAILED.<br><br>'
 
             message += 'Scheduled Time: ' + \
-                       get_datetime_string(datetime_from_utc_to_local(install_job.scheduled_time)) + \
-                       ' (CSM Server Time)<br>'
+                       get_datetime_string(install_job.scheduled_time) + \
+                       ' UTC<br>'
             message += 'Start Time: ' + \
-                       get_datetime_string(datetime_from_utc_to_local(install_job.start_time)) + \
-                       ' (CSM Server Time)<br>'
+                       get_datetime_string(install_job.start_time) + \
+                       ' UTC<br>'
             message += 'Install Action: ' + install_job.install_action + '<br><br>'
 
             message = self.check_command_file_diff(install_job, message)
@@ -219,7 +219,6 @@ class InstallWorkUnit(WorkUnit):
 
         except Exception:
             logger.exception('create_email_notification() hit exception')
-
 
     def check_command_file_diff(self, install_job, message):
         file_suffix = '.diff.html'

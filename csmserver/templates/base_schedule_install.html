@@ -125,6 +125,12 @@ var host_software_platform = null;
 var host_software_version = null;
 
 $(function() {
+    var use_utc_timezone = "{{ system_option.use_utc_timezone }}" == 'True';
+    if (use_utc_timezone) {
+        $('#label_scheduled_time').text('Scheduled Time (UTC)');
+    } else {
+        $('#label_scheduled_time').text('Scheduled Time');
+    }
 
     var PRE_UPGRADE = "{{ install_action.pre_upgrade }}";
     var INSTALL_ADD = "{{ install_action.add }}";
@@ -294,7 +300,23 @@ $(function() {
         }
     }
 
-    var server_time_as_locale_time = convertToLocaleString("{{ server_time | datetime_string }}");
+    // server_time is always in UTC format.
+    var current_time = "{{ server_time | datetime_string }}";
+    if (!use_utc_timezone) {
+        current_time = convertToLocaleString(current_time);
+    }
+
+    $('#scheduled-time-UTC').val(function(index, value) {
+        if (value == 'None' || value.length == 0) {
+            $('#scheduled-time').val(current_time);
+        } else {
+            if (use_utc_timezone) {
+                $('#scheduled-time').val(value);
+            } else {
+                $('#scheduled-time').val(convertToLocaleString(value));
+            }
+        }
+    });
 
     // Called when the Schedule (i.e. submit) button is clicked but before the
     // form actually being submitted.  Returning false will stop the submission.
@@ -328,20 +350,15 @@ $(function() {
             return false;
         }
 
-        $('#scheduled-time-UTC').val(convertToUTCString($('#scheduled-time').val()));
+        if (use_utc_timezone) {
+            $('#scheduled-time-UTC').val($('#scheduled-time').val());
+        } else {
+            $('#scheduled-time-UTC').val(convertToUTCString($('#scheduled-time').val()));
+        }
 
         return true;
     });
 
-
-    // Convert the UTC time to Locale time
-    $('#scheduled-time-UTC').val(function(index, value) {
-        if (value == 'None' || value.length == 0) {
-            $('#scheduled-time').val(server_time_as_locale_time);
-        } else {
-            $('#scheduled-time').val(convertToLocaleString(value));
-        }
-    });
 
     // Called by the $('#form').submit() function.
     function on_final_submit(current_form, hostname) {

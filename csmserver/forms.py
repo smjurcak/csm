@@ -129,7 +129,6 @@ class ScheduleInstallForm(HostScheduleInstallForm):
     role = SelectField('Role', coerce=str, choices=[('ALL', 'ALL')])
     software = SelectField('Software Version', coerce=str, choices=[('ALL', 'ALL')])
 
-
 class ServerForm(Form):
     hostname = StringField('Server Repository Name', [required()])
     server_type = SelectField('Server Type', coerce=str,
@@ -182,6 +181,7 @@ class AdminConsoleForm(Form):
     enable_cco_lookup = HiddenField("Enable CCO Connection")
     cco_lookup_time = HiddenField("Last Retrieval")
     enable_user_credential_for_host = HiddenField("Use CSM Server User Credential")
+    use_utc_timezone = HiddenField("Use UTC Time Zone")
 
 
 class SMTPForm(Form):
