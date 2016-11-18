@@ -714,7 +714,8 @@ class SMUInfo(Base):
     name = Column(String(50))
     status = Column(String(20))
     type = Column(String(20)) # Recommended, Optional, PSIRT
-    package_type = Column(String(20)) 
+    package_type = Column(String(20))
+    smu_category = Column(String(20))
     posted_date = Column(String(30))
     eta_date = Column(String(30))
     ddts = Column(String(20))
